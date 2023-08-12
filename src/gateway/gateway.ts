@@ -10,7 +10,7 @@ import { Server } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://boloons-ui.vercel.app/'],
   },
 })
 export class GameGateway implements OnModuleInit {
