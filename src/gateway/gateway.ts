@@ -18,7 +18,6 @@ export class GameGateway implements OnModuleInit {
   server: Server;
   gameSession: {
     [id: string]: {
-      name: string;
       inProgress: boolean;
       players: {
         [id: string]: {
@@ -50,10 +49,9 @@ export class GameGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('createSession')
-  onNewGameSession(@MessageBody() body: { gameId: string; name: string }) {
-    const { gameId, name = '' } = body;
+  onNewGameSession(@MessageBody() body: { gameId: string }) {
+    const { gameId } = body;
     this.gameSession[gameId] = {
-      name,
       players: {},
       inProgress: false,
     };
