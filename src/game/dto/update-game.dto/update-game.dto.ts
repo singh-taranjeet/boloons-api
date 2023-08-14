@@ -1,7 +1,7 @@
 import { IsBoolean, IsString } from 'class-validator';
 export class UpdateGameDto {
   @IsString()
-  id: string;
+  gameId: string;
 
   @IsBoolean()
   inProgress: boolean;

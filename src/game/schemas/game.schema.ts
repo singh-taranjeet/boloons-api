@@ -11,6 +11,9 @@ export class Game {
 
   @Prop()
   players: [PlayerType];
+
+  @Prop()
+  gameId: string;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

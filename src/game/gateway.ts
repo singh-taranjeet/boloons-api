@@ -7,16 +7,20 @@ import {
 } from '@nestjs/websockets';
 
 import { Server } from 'socket.io';
+import { GameService } from './game.service';
 
 @WebSocketGateway({
-  namespace: 'events',
   cors: {
     origin: ['http://localhost:3000', 'https://boloons-ui.vercel.app'],
   },
 })
 export class GameGateway implements OnModuleInit {
+  constructor(private readonly GameService: GameService) {
+    this.gameSession = {};
+  }
   @WebSocketServer()
   server: Server;
+
   gameSession: {
     [id: string]: {
       inProgress: boolean;
@@ -28,10 +32,6 @@ export class GameGateway implements OnModuleInit {
       };
     };
   };
-
-  constructor() {
-    this.gameSession = {};
-  }
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
@@ -50,13 +50,14 @@ export class GameGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('createSession')
-  onNewGameSession(@MessageBody() body: { gameId: string }) {
+  async onNewGameSession(@MessageBody() body: { gameId: string }) {
     const { gameId } = body;
     this.gameSession[gameId] = {
       players: {},
       inProgress: false,
     };
-    console.log('created a new session', this.gameSession[gameId]);
+
+    this.GameService.createGame(gameId);
   }
 
   @SubscribeMessage('playerJoined')

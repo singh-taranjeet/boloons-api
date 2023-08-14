@@ -8,18 +8,18 @@ import { AppConstants } from '../utils/constants';
 export class GameService {
   constructor(@InjectModel(Game.name) private GameModel: Model<Game>) {}
 
-  async createGame() {
-    const createdGame = new this.GameModel({ inProgress: false });
+  async createGame(gameId: string) {
+    const createdGame = new this.GameModel({ gameId, inProgress: false });
     await createdGame.save();
     return AppConstants.response.successResponse(createdGame);
   }
 
   async updateGame(
-    _id: string,
+    gameId: string,
     inProgress: boolean,
   ): Promise<{ success: boolean }> {
     const game = await this.GameModel.findOneAndUpdate(
-      { _id },
+      { gameId },
       { inProgress },
     ).exec();
 
@@ -42,7 +42,7 @@ export class GameService {
     };
 
     const updated = await this.GameModel.findOneAndUpdate(
-      { _id: gameId, inProgress: false },
+      { gameId, inProgress: false },
       {
         $push: { players: newPlayer },
       },
@@ -60,9 +60,9 @@ export class GameService {
     throw new NotFoundException();
   }
 
-  async getGame(params: { _id: string }) {
-    const { _id } = params;
-    const game = await this.GameModel.findOne({ _id }, { inProgress: 1 });
+  async getGame(params: { gameId: string }) {
+    const { gameId } = params;
+    const game = await this.GameModel.findOne({ gameId }, { inProgress: 1 });
     console.log('game', game);
     if (game) {
       return AppConstants.response.successResponse(game);

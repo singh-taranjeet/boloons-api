@@ -11,6 +11,7 @@ import {
 import { GameService } from './game.service';
 import { UpdateGameDto } from './dto/update-game.dto/update-game.dto';
 import { AddPlayerDto } from './dto/add-player.dto/add-player.dto';
+import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
 
 @Controller('game')
 export class GameController {
@@ -22,21 +23,22 @@ export class GameController {
   }
 
   @Get(':id')
-  getGame(@Param('id') _id: string) {
-    return this.GameService.getGame({ _id });
+  getGame(@Param('id') gameId: string) {
+    return this.GameService.getGame({ gameId });
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create() {
-    return this.GameService.createGame();
+  create(@Body() createGameDto: CreateGameDto) {
+    const { gameId } = createGameDto;
+    return this.GameService.createGame(gameId);
   }
 
   @Patch()
   @HttpCode(HttpStatus.OK)
   update(@Body() updateGameDto: UpdateGameDto) {
-    const { id, inProgress } = updateGameDto;
-    return this.GameService.updateGame(id, inProgress);
+    const { gameId, inProgress } = updateGameDto;
+    return this.GameService.updateGame(gameId, inProgress);
   }
 
   @Post('/player')
