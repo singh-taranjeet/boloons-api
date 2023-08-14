@@ -1,5 +1,4 @@
-import { IsObject, IsString } from 'class-validator';
-import { PlayerType } from 'src/game/schemas/types';
+import { IsString } from 'class-validator';
 export class AddPlayerDto {
   @IsString()
   id: string;

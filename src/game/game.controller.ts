@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -16,8 +17,13 @@ export class GameController {
   constructor(private readonly GameService: GameService) {}
 
   @Get()
-  findAll() {
-    return this.GameService.findAllGames();
+  getAllGames() {
+    return this.GameService.getAllGames();
+  }
+
+  @Get(':id')
+  getGame(@Param('id') _id: string) {
+    return this.GameService.getGame({ _id });
   }
 
   @Post()

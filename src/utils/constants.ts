@@ -1,7 +1,10 @@
 export const AppConstants = {
   response: {
-    successResponse: {
-      success: true,
+    successResponse: (payload?: object) => {
+      return {
+        success: true,
+        payload,
+      };
     },
   },
 };

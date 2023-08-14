@@ -1,5 +1,4 @@
-import { IsArray, IsBoolean, IsString } from 'class-validator';
-import { PlayerType } from 'src/game/schemas/types';
+import { IsBoolean, IsString } from 'class-validator';
 export class UpdateGameDto {
   @IsString()
   id: string;
