@@ -9,6 +9,7 @@ import {
 import { Server } from 'socket.io';
 
 @WebSocketGateway({
+  namespace: 'events',
   cors: {
     origin: ['http://localhost:3000', 'https://boloons-ui.vercel.app'],
   },
