@@ -30,6 +30,16 @@ export class GameService {
     throw new NotFoundException();
   }
 
+  async deleteGame(gameId: string) {
+    const game = await this.GameModel.findOneAndDelete({ gameId }).exec();
+
+    if (game) {
+      return AppConstants.response.successResponse();
+    }
+
+    throw new NotFoundException();
+  }
+
   async getAllGames(): Promise<Game[]> {
     return this.GameModel.find().exec();
   }

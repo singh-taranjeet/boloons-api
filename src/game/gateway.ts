@@ -50,10 +50,16 @@ export class GameGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('createSession')
-  async onNewGameSession(@MessageBody() body: { gameId: string }) {
-    const { gameId } = body;
+  async onNewGameSession(
+    @MessageBody() body: { gameId: string; playerId: string; name: string },
+  ) {
+    const { gameId, playerId, name } = body;
     this.gameSession[gameId] = {
-      players: {},
+      players: {
+        [playerId]: {
+          name,
+        },
+      },
       inProgress: false,
     };
 
@@ -93,6 +99,8 @@ export class GameGateway implements OnModuleInit {
         type: 'GameStartedMsg',
         gameId,
       });
+      // set in progress true
+      this.GameService.deleteGame(gameId);
     }
   }
 
