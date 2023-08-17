@@ -7,4 +7,8 @@ export const AppConstants = {
       };
     },
   },
+  cookies: {
+    playerName: 'playerName',
+    playerId: 'playerId',
+  },
 };

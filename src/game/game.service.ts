@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Game } from './schemas/game.schema';
+import { Game } from '../utils/schemas/game.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { AppConstants } from '../utils/constants';
 

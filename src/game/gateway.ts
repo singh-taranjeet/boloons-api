@@ -9,11 +9,7 @@ import {
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 
-@WebSocketGateway({
-  cors: {
-    origin: ['http://localhost:3000', 'https://boloons-ui.vercel.app'],
-  },
-})
+@WebSocketGateway({ cors: true })
 export class GameGateway implements OnModuleInit {
   constructor(private readonly GameService: GameService) {
     this.gameSession = {};
