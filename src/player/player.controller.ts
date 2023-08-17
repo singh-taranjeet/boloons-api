@@ -8,7 +8,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { faker } from '@faker-js/faker';
 import { AppConstants } from 'src/utils/constants';
 import { PlayerService } from './player.service';
@@ -19,28 +19,24 @@ export class PlayerController {
 
   @Get()
   @HttpCode(HttpStatus.CREATED)
-  async findAll(
-    @Req() request: Request,
+  async findPlayer(
+    //@Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    if (!request.cookies[AppConstants.cookies.playerId]) {
-      const name = faker.person.fullName();
-      const res = await this.PlayerService.createPlayer(name);
-      response.cookie(AppConstants.cookies.playerId, res);
-      response.cookie(AppConstants.cookies.playerName, name);
-      return AppConstants.response.successResponse({
-        id: res,
-        name,
-      });
-    }
-    return AppConstants.response.successResponse(
-      request.cookies[AppConstants.cookies.playerId],
-    );
+    const name = faker.person.fullName();
+    const res = await this.PlayerService.createPlayer(name);
+    response.cookie(AppConstants.cookies.playerId, res);
+    response.cookie(AppConstants.cookies.playerName, name);
+    return AppConstants.response.successResponse({
+      id: res,
+      name,
+    });
   }
 
   @Patch()
   @HttpCode(HttpStatus.OK)
-  update(@Body() id: string, name: string) {
+  update(@Body() params: { id: string; name: string }) {
+    const { id, name } = params;
     return this.PlayerService.updatePlayerName(id, name);
   }
 

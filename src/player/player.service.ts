@@ -13,7 +13,7 @@ export class PlayerService {
     return newPlayer._id;
   }
 
-  async updatePlayerName(name: string, id: string) {
+  async updatePlayerName(id: string, name: string) {
     const player = await this.PlayerModel.findOneAndUpdate(
       { _id: id },
       { name },
