@@ -1,7 +1,6 @@
 import { OnModuleInit } from '@nestjs/common';
 import {
   MessageBody,
-  ConnectedSocket,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -9,8 +8,15 @@ import {
 
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
-import { RedisKeys } from 'src/utils/constants';
+import { GameConstants, RedisKeys } from 'src/utils/constants';
 import { RedisService } from 'src/redis/redis.service';
+import {
+  generateRedisGameSessionKey,
+  generateRedisKeyPlayerData,
+  generateRedisKeyPlayersList,
+  generateRedisKeyPlayerSocket,
+  generateRedisKeySocketPlayer,
+} from './methods';
 
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnModuleInit {
@@ -39,17 +45,29 @@ export class GameGateway implements OnModuleInit {
     this.server.on('connection', (socket) => {
       console.log('Socket id', socket.id);
 
-      socket.on('login', (params: { id: string }) => {
+      const socketId = `${socket.id}`;
+
+      socket.on('login', async (params: { id: string }) => {
         const { id } = params;
-        this.redisService
-          .redisClient()
-          .hSet(`${RedisKeys.player}:${socket.id}`, { id });
-        this.redisService.redisClient().sAdd(RedisKeys.usersOnline, socket.id);
+
+        const playerKey = generateRedisKeySocketPlayer(id);
+        this.redisService.redisClient().hSet(playerKey, { id: socketId });
+
+        const key = generateRedisKeyPlayerSocket(socketId);
+        this.redisService.redisClient().hSet(key, { id });
+
+        this.redisService.redisClient().sAdd(RedisKeys.usersOnline, socketId);
+        console.log('done');
       });
 
-      socket.on('disconnect', () => {
-        this.redisService.redisClient().del(`${RedisKeys.player}:${socket.id}`);
-        this.redisService.redisClient().sRem(RedisKeys.usersOnline, socket.id);
+      socket.on('disconnect', async () => {
+        const key = generateRedisKeyPlayerSocket(socketId);
+        const playerId = await this.redisService.redisClient().hGet(key, 'id');
+
+        const key2 = generateRedisKeySocketPlayer(playerId);
+        await this.redisService.redisClient().del(key);
+        await this.redisService.redisClient().del(key2);
+        this.redisService.redisClient().sRem(RedisKeys.usersOnline, socketId);
       });
     });
   }
@@ -82,22 +100,40 @@ export class GameGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('playerJoined')
-  onplayerJoin(
+  async onplayerJoin(
     @MessageBody() body: { gameId: string; name: string; playerId: string },
   ) {
     const { gameId, name, playerId } = body;
     console.log('new request for player to join');
-    // Check if this player already exist
-    const exist = this.gameSession[gameId];
-    if (exist) {
-      this.gameSession[gameId].players[playerId] = {
+
+    const isPlayerOnline = await this.redisService.isPlayerOnline(playerId);
+
+    // check if this session exist and is waiting for players
+    const key = generateRedisGameSessionKey(gameId);
+    const gameStep = await this.redisService.redisClient().hGet(key, 'step');
+    const playersKey = generateRedisKeyPlayersList(gameId);
+    const alreadyJoined = await this.redisService
+      .redisClient()
+      .sIsMember(playersKey, playerId);
+    console.log('Already joined', alreadyJoined, gameStep, isPlayerOnline);
+    // If the game has not started and player not joined already
+    if (
+      gameStep &&
+      gameStep === GameConstants.step.Waitingplayers &&
+      !alreadyJoined &&
+      isPlayerOnline
+    ) {
+      const playerKey = generateRedisKeyPlayerData(playerId, gameId);
+      await this.redisService.redisClient().hSet(playerKey, {
         name: name || '',
         score: 0,
-      };
+      });
+      const players = await this.redisService.getplayersOfGame(gameId);
+      console.log('Players in this game session', players);
       // send a message to the session that player has joined
       this.server.emit(gameId, {
         type: 'PlayerjoinedMsg',
-        players: this.getPlayers(gameId),
+        players,
       });
     }
   }

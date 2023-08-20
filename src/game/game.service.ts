@@ -5,8 +5,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AppConstants, GameConstants } from '../utils/constants';
 import { RedisService } from 'src/redis/redis.service';
 import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
-import { generateRedisGameSessionKey } from './methods';
 import { GameStep } from 'src/utils/schemas/types';
+import { generateRedisGameSessionKey } from './methods';
 
 @Injectable()
 export class GameService {
@@ -25,15 +25,16 @@ export class GameService {
     });
     await createdGame.save();
     const gameId = `${createdGame._id}`;
-    const key = generateRedisGameSessionKey(gameId);
-    this.redisService.createHash({
-      key,
+
+    this.redisService.createGameSession({
+      key: gameId,
       payload: {
         type,
         family,
         step: createdGame.step,
       },
     });
+
     return AppConstants.response.successResponse(gameId);
   }
 

@@ -1,6 +1,13 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { REDIS_CLIENT, RedisClient } from './redis-client.type';
 import { GameFamily, GameStep, GameType } from 'src/utils/schemas/types';
+import {
+  generateRedisGameSessionKey,
+  generateRedisKeyPlayerData,
+  generateRedisKeyPlayerSocket,
+  generateRedisKeyPlayersList,
+  generateRedisKeySocketPlayer,
+} from 'src/game/methods';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -16,12 +23,42 @@ export class RedisService implements OnModuleDestroy {
     return this.redis.ping();
   }
 
-  async createHash(params: {
+  async createGameSession(params: {
     key: string;
-    payload: { type: GameType; family: GameFamily; step: GameStep };
+    payload: {
+      type: GameType;
+      family: GameFamily;
+      step: GameStep;
+    };
   }) {
     const { key, payload } = params;
-    return this.redis.hSet(key, payload);
+
+    const gameKey = generateRedisGameSessionKey(key);
+
+    this.redis.hSet(gameKey, payload);
+    this.redis.expire(gameKey, 5 * 60);
+    const playersKey = generateRedisKeyPlayersList(key);
+    this.redis.sAdd(playersKey, 'df');
+    this.redis.expire(playersKey, 5 * 60);
+  }
+
+  async isPlayerOnline(playerId: string) {
+    const playerKey = generateRedisKeySocketPlayer(playerId);
+    const player = await this.redis.hGet(playerKey, 'id');
+
+    return player;
+  }
+
+  async getplayersOfGame(gameId: string) {
+    const playersKey = generateRedisKeyPlayersList(gameId);
+    const players = this.redis.sMembers(playersKey);
+    const onlinePlayers = [];
+    (await players).forEach(async (player) => {
+      const playerKey = generateRedisKeyPlayerData(player, gameId);
+      const data = await this.redis.hGetAll(playerKey);
+      onlinePlayers.push(data);
+    });
+    return onlinePlayers;
   }
 
   public redisClient() {
