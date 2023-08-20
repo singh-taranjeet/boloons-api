@@ -120,9 +120,13 @@ export class GameGateway implements OnModuleInit {
     if (
       gameStep &&
       gameStep === GameConstants.step.Waitingplayers &&
-      !alreadyJoined &&
-      isPlayerOnline
+      !alreadyJoined
     ) {
+      // add this player to players list of this game
+      const playersKey = generateRedisKeyPlayersList(gameId);
+      await this.redisService.redisClient().sAdd(playersKey, playerId);
+
+      // Create data of this player
       const playerKey = generateRedisKeyPlayerData(playerId, gameId);
       await this.redisService.redisClient().hSet(playerKey, {
         name: name || '',

@@ -101,13 +101,12 @@ export class GameService {
 
   async getGame(params: { gameId: string }) {
     const { gameId } = params;
-    const game = await this.GameModel.findOne(
-      { gameId },
-      { inProgress: 1, _id: false },
-    ).exec();
-    console.log('game', game, gameId);
-    if (game) {
-      return AppConstants.response.successResponse(game);
+    const step = await this.redisService
+      .redisClient()
+      .hGet(generateRedisGameSessionKey(gameId), 'step');
+    console.log('game', step);
+    if (step === GameConstants.step.Waitingplayers) {
+      return AppConstants.response.successResponse(step);
     }
 
     throw new NotFoundException();

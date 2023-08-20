@@ -4,7 +4,6 @@ import { GameFamily, GameStep, GameType } from 'src/utils/schemas/types';
 import {
   generateRedisGameSessionKey,
   generateRedisKeyPlayerData,
-  generateRedisKeyPlayerSocket,
   generateRedisKeyPlayersList,
   generateRedisKeySocketPlayer,
 } from 'src/game/methods';
@@ -37,8 +36,8 @@ export class RedisService implements OnModuleDestroy {
 
     this.redis.hSet(gameKey, payload);
     this.redis.expire(gameKey, 5 * 60);
+
     const playersKey = generateRedisKeyPlayersList(key);
-    this.redis.sAdd(playersKey, 'df');
     this.redis.expire(playersKey, 5 * 60);
   }
 
@@ -51,13 +50,14 @@ export class RedisService implements OnModuleDestroy {
 
   async getplayersOfGame(gameId: string) {
     const playersKey = generateRedisKeyPlayersList(gameId);
-    const players = this.redis.sMembers(playersKey);
+    const players = await this.redis.sMembers(playersKey);
+
     const onlinePlayers = [];
-    (await players).forEach(async (player) => {
-      const playerKey = generateRedisKeyPlayerData(player, gameId);
+    for (let i = 0; i < players.length; i++) {
+      const playerKey = generateRedisKeyPlayerData(players[i], gameId);
       const data = await this.redis.hGetAll(playerKey);
       onlinePlayers.push(data);
-    });
+    }
     return onlinePlayers;
   }
 
