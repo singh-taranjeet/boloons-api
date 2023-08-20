@@ -59,7 +59,7 @@ export class GameGateway implements OnModuleInit {
       inProgress: false,
     };
 
-    this.GameService.createGame(gameId);
+    //this.GameService.createGame(gameId);
   }
 
   @SubscribeMessage('playerJoined')

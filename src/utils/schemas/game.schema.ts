@@ -1,19 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { PlayerType } from './types';
+import { GameFamily, GameStep, GameType } from './types';
 
 export type GameDocument = HydratedDocument<Game>;
 
 @Schema()
 export class Game {
   @Prop()
-  inProgress: boolean;
+  step: GameStep;
 
   @Prop()
-  players: [PlayerType];
+  type: GameType;
 
   @Prop()
-  gameId: string;
+  family: GameFamily;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

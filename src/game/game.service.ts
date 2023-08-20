@@ -2,28 +2,55 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Game } from '../utils/schemas/game.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { AppConstants } from '../utils/constants';
+import { AppConstants, GameConstants } from '../utils/constants';
+import { RedisService } from 'src/redis/redis.service';
+import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
+import { generateRedisGameSessionKey } from './methods';
+import { GameStep } from 'src/utils/schemas/types';
 
 @Injectable()
 export class GameService {
-  constructor(@InjectModel(Game.name) private GameModel: Model<Game>) {}
+  constructor(
+    @InjectModel(Game.name) private GameModel: Model<Game>,
+    private readonly redisService: RedisService,
+  ) {}
 
-  async createGame(gameId: string) {
-    const createdGame = new this.GameModel({ gameId, inProgress: false });
+  async createGame(createGameDto: CreateGameDto) {
+    const { type, family } = createGameDto;
+    // Create Record on Mongo
+    const createdGame = new this.GameModel({
+      type,
+      family,
+      step: GameConstants.step.Waitingplayers,
+    });
     await createdGame.save();
-    return AppConstants.response.successResponse(createdGame);
+    const gameId = `${createdGame._id}`;
+    const key = generateRedisGameSessionKey(gameId);
+    this.redisService.createHash({
+      key,
+      payload: {
+        type,
+        family,
+        step: createdGame.step,
+      },
+    });
+    return AppConstants.response.successResponse(gameId);
   }
 
-  async updateGame(
+  async updateGameStep(
     gameId: string,
-    inProgress: boolean,
+    step: GameStep,
   ): Promise<{ success: boolean }> {
     const game = await this.GameModel.findOneAndUpdate(
-      { gameId },
-      { inProgress },
+      { _id: gameId },
+      { step },
     ).exec();
 
     if (game) {
+      const key = generateRedisGameSessionKey(gameId);
+      await this.redisService.redisClient().hSet(key, {
+        step: step,
+      });
       return AppConstants.response.successResponse();
     }
 
@@ -34,13 +61,14 @@ export class GameService {
     const game = await this.GameModel.findOneAndDelete({ gameId }).exec();
 
     if (game) {
+      this.redisService.redisClient().del(generateRedisGameSessionKey(gameId));
       return AppConstants.response.successResponse();
     }
 
     throw new NotFoundException();
   }
 
-  async getAllGames(): Promise<Game[]> {
+  async getAllGames() {
     return this.GameModel.find().exec();
   }
 
@@ -72,8 +100,11 @@ export class GameService {
 
   async getGame(params: { gameId: string }) {
     const { gameId } = params;
-    const game = await this.GameModel.findOne({ gameId }, { inProgress: 1 });
-    console.log('game', game);
+    const game = await this.GameModel.findOne(
+      { gameId },
+      { inProgress: 1, _id: false },
+    ).exec();
+    console.log('game', game, gameId);
     if (game) {
       return AppConstants.response.successResponse(game);
     }

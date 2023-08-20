@@ -1,5 +1,10 @@
-import { IsString } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { GameConstants } from 'src/utils/constants';
+import { GameFamily, GameType } from 'src/utils/schemas/types';
 export class CreateGameDto {
-  @IsString()
-  gameId: string;
+  @IsEnum(GameConstants.type)
+  type: GameType;
+
+  @IsEnum(GameConstants.family)
+  family: GameFamily;
 }
