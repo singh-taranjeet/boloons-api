@@ -3,16 +3,15 @@ import { Model } from 'mongoose';
 import { Game } from '../utils/schemas/game.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { AppConstants, GameConstants } from '../utils/constants';
-import { RedisService } from 'src/redis/redis.service';
 import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
 import { GameStep } from 'src/utils/schemas/types';
-import { generateRedisGameSessionKey } from './methods';
+import { GameCacheService } from './game-cache.service';
 
 @Injectable()
 export class GameService {
   constructor(
     @InjectModel(Game.name) private GameModel: Model<Game>,
-    private readonly redisService: RedisService,
+    private readonly gameCacheService: GameCacheService,
   ) {}
 
   async createGame(createGameDto: CreateGameDto) {
@@ -26,15 +25,11 @@ export class GameService {
     await createdGame.save();
     const gameId = `${createdGame._id}`;
 
-    this.redisService.createGameSession({
-      key: gameId,
-      payload: {
-        type,
-        family,
-        step: createdGame.step,
-      },
+    await this.gameCacheService.createGameCache({
+      type,
+      family,
+      gameId,
     });
-
     return AppConstants.response.successResponse(gameId);
   }
 
@@ -48,10 +43,7 @@ export class GameService {
     ).exec();
 
     if (game) {
-      const key = generateRedisGameSessionKey(gameId);
-      await this.redisService.redisClient().hSet(key, {
-        step: step,
-      });
+      await this.gameCacheService.updateGameStep(gameId, step);
       return AppConstants.response.successResponse();
     }
 
@@ -62,7 +54,7 @@ export class GameService {
     const game = await this.GameModel.findOneAndDelete({ gameId }).exec();
 
     if (game) {
-      this.redisService.redisClient().del(generateRedisGameSessionKey(gameId));
+      await this.gameCacheService.deleteGame(gameId);
       return AppConstants.response.successResponse();
     }
 
@@ -101,12 +93,10 @@ export class GameService {
 
   async getGame(params: { gameId: string }) {
     const { gameId } = params;
-    const step = await this.redisService
-      .redisClient()
-      .hGet(generateRedisGameSessionKey(gameId), 'step');
-    console.log('game', step);
-    if (step === GameConstants.step.Waitingplayers) {
-      return AppConstants.response.successResponse(step);
+    const isGameWaiting = this.gameCacheService.isGameWaiting(gameId);
+
+    if (isGameWaiting) {
+      return AppConstants.response.successResponse();
     }
 
     throw new NotFoundException();

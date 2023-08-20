@@ -23,7 +23,7 @@ export const RedisKeys = {
 
 export const GameConstants = {
   step: {
-    Waitingplayers: 'Waiting Players',
+    Waitingplayers: 'Waitingplayers',
     Started: 'Started',
     Stopped: 'Stopped',
   },
@@ -33,5 +33,18 @@ export const GameConstants = {
   },
   family: {
     SumAddict: 'SumAddict',
+  },
+} as const;
+
+export const Events = {
+  connect: {
+    login: 'login',
+    disconnect: 'disconnect',
+    connection: 'connection',
+  },
+  game: {
+    playerJoined: 'PlayerjoinedMsg',
+    gameStarted: 'GameStartedMsg',
+    gameScored: 'gameScored',
   },
 } as const;

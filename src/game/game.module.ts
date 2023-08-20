@@ -5,6 +5,7 @@ import { GameService } from './game.service';
 import { Game, GameSchema } from '../utils/schemas/game.schema';
 import { GameGateway } from './gateway';
 import { RedisModule } from 'src/redis/redis.module';
+import { GameCacheService } from './game-cache.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { RedisModule } from 'src/redis/redis.module';
     RedisModule,
   ],
   controllers: [GameController],
-  providers: [GameService, GameGateway],
+  providers: [GameService, GameGateway, GameCacheService],
 })
 export class GameModule {}

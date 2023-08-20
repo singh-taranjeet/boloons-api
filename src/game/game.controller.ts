@@ -40,6 +40,18 @@ export class GameController {
     return this.GameService.updateGameStep(gameId, step);
   }
 
+  @Post('/join-player')
+  @HttpCode(HttpStatus.CREATED)
+  addPlayerToGame() {
+    // send a message to the session that player has joined
+    // this.server.emit(gameId, {
+    //   type: 'PlayerjoinedMsg',
+    //   players,
+    // });
+    return {
+      Hello: 'world',
+    };
+  }
   // @Delete()
   // @HttpCode(HttpStatus.OK)
   // deleteGame(@Body() DeleteGameDto: CreateGameDto) {

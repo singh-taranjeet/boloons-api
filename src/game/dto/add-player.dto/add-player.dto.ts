@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 export class AddPlayerDto {
   @IsString()
-  id: string;
+  playerId: string;
 
   @IsString()
   name: string;
