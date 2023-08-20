@@ -1,6 +1,7 @@
 import { OnModuleInit } from '@nestjs/common';
 import {
   MessageBody,
+  ConnectedSocket,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -8,10 +9,15 @@ import {
 
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
+import { RedisKeys } from 'src/utils/constants';
+import { RedisService } from 'src/redis/redis.service';
 
 @WebSocketGateway({ cors: true })
 export class GameGateway implements OnModuleInit {
-  constructor(private readonly GameService: GameService) {
+  constructor(
+    private readonly GameService: GameService,
+    private readonly redisService: RedisService,
+  ) {
     this.gameSession = {};
   }
   @WebSocketServer()
@@ -32,6 +38,19 @@ export class GameGateway implements OnModuleInit {
   onModuleInit() {
     this.server.on('connection', (socket) => {
       console.log('Socket id', socket.id);
+
+      socket.on('login', (params: { id: string }) => {
+        const { id } = params;
+        this.redisService
+          .redisClient()
+          .hSet(`${RedisKeys.player}:${socket.id}`, { id });
+        this.redisService.redisClient().sAdd(RedisKeys.usersOnline, socket.id);
+      });
+
+      socket.on('disconnect', () => {
+        this.redisService.redisClient().del(`${RedisKeys.player}:${socket.id}`);
+        this.redisService.redisClient().sRem(RedisKeys.usersOnline, socket.id);
+      });
     });
   }
 

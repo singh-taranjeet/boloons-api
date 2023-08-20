@@ -13,6 +13,12 @@ export const AppConstants = {
   },
 } as const;
 
+export const RedisKeys = {
+  usersOnline: 'users:online',
+  gameSession: 'game:session',
+  player: 'player',
+} as const;
+
 export const GameConstants = {
   gameKeys: {
     gameSession: 'game:session',
