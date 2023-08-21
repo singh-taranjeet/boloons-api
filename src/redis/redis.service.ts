@@ -1,12 +1,12 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { REDIS_CLIENT, RedisClient } from './redis-client.type';
-import { GameFamily, GameStep, GameType } from 'src/utils/schemas/types';
+import { GameFamily, GameStep, GameType } from 'src/game/utils/types';
 import {
   generateRedisGameSessionKey,
   generateRedisKeyPlayerData,
   generateRedisKeyPlayersList,
   generateRedisKeySocketPlayer,
-} from 'src/game/methods';
+} from 'src/game/utils/methods';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {

@@ -1,4 +1,4 @@
-import { GameConstants } from '../constants';
+import { Events, GameConstants } from './constants';
 
 export interface PlayerType {
   id: string;
@@ -9,3 +9,5 @@ export interface PlayerType {
 export type GameStep = keyof typeof GameConstants.step;
 export type GameType = keyof typeof GameConstants.type;
 export type GameFamily = keyof typeof GameConstants.family;
+
+export type GameEventMessageType = keyof typeof Events.game.eventMessageType;

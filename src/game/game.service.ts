@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Game } from '../utils/schemas/game.schema';
+import { Game } from './utils/schemas/game.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { AppConstants, GameConstants } from '../utils/constants';
+import { GameConstants } from './utils/constants';
 import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
-import { GameStep } from 'src/utils/schemas/types';
+import { GameStep } from 'src/game/utils/types';
 import { GameCacheService } from './game-cache.service';
+import { AppConstants } from 'src/utils/constants';
 
 @Injectable()
 export class GameService {

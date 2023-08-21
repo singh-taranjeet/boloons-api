@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { GameFamily, GameStep, GameType } from './types';
+import { GameFamily, GameStep, GameType } from '../types';
 
 export type GameDocument = HydratedDocument<Game>;
 

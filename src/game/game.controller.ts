@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -10,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
-import { GameFamily, GameStep, GameType } from 'src/utils/schemas/types';
 import { UpdateGameDto } from './dto/update-game.dto/update-game.dto';
+import { StopGameDto } from './dto/stop-game.dto/stop-game.dto';
 
 @Controller('game')
 export class GameController {
@@ -39,30 +40,4 @@ export class GameController {
     const { gameId, step } = params;
     return this.GameService.updateGameStep(gameId, step);
   }
-
-  @Post('/join-player')
-  @HttpCode(HttpStatus.CREATED)
-  addPlayerToGame() {
-    // send a message to the session that player has joined
-    // this.server.emit(gameId, {
-    //   type: 'PlayerjoinedMsg',
-    //   players,
-    // });
-    return {
-      Hello: 'world',
-    };
-  }
-  // @Delete()
-  // @HttpCode(HttpStatus.OK)
-  // deleteGame(@Body() DeleteGameDto: CreateGameDto) {
-  //   const { gameId } = DeleteGameDto;
-  //   return this.GameService.deleteGame(gameId);
-  // }
-
-  // @Post('/player')
-  // @HttpCode(HttpStatus.CREATED)
-  // AddPlayer(@Body() addPlayerDto: AddPlayerDto) {
-  //   const { id, gameId, name } = addPlayerDto;
-  //   return this.GameService.addPlayer(id, name, gameId);
-  // }
 }

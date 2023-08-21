@@ -1,4 +1,4 @@
-import { RedisKeys } from 'src/utils/constants';
+import { RedisKeys } from './constants';
 
 export function generateRedisGameSessionKey(gameId: string) {
   return `${RedisKeys.gameSession}:${gameId}`;

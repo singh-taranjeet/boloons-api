@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { GameConstants, RedisKeys } from '../utils/constants';
+import { GameConstants, RedisKeys } from './utils/constants';
 import { RedisService } from 'src/redis/redis.service';
-import { GameFamily, GameStep, GameType } from 'src/utils/schemas/types';
+import { GameFamily, GameStep, GameType } from 'src/game/utils/types';
 import {
   generateRedisGameSessionKey,
   generateRedisKeyPlayerSocket,
   generateRedisKeySocketPlayer,
   generateRedisKeyPlayersList,
   generateRedisKeyPlayerData,
-} from './methods';
+} from './utils/methods';
 
 @Injectable()
 export class GameCacheService {
@@ -113,6 +113,7 @@ export class GameCacheService {
     const key = generateRedisKeyPlayerData(playerId, gameId);
     await this.redisService.redisClient().hSet(key, {
       name: playerName,
+      id: playerId,
       score: 0,
     });
   }
@@ -139,26 +140,33 @@ export class GameCacheService {
   }) {
     const { gameId, name = '', playerId } = body;
 
-    console.log('New request to join');
-
     const isPlayerOnline = await this.isPlayerOnline(playerId);
 
     // check if this session exist and is waiting for players
-    const isGameWaiting = this.isGameWaiting(gameId);
+    const isGameWaiting = await this.isGameWaiting(gameId);
 
     const alreadyJoined = await this.isPlayerInGameList(playerId, gameId);
 
-    // If the game has not started and player not joined already
-    if (isGameWaiting && !alreadyJoined) {
+    if (alreadyJoined) {
+      const players = await this.getplayersOfGame(gameId);
+      return {
+        alreadyJoined,
+        players,
+      };
+    }
+
+    // If the game has not started
+    if (isGameWaiting) {
       // add this player to players list of this game
       await this.addPlayerToGameList(playerId, gameId);
-
       // Create data of this player
       await this.createPlayerData(playerId, name, gameId);
       const players = await this.getplayersOfGame(gameId);
-      return players;
+      return {
+        players,
+      };
     }
-    return false;
+    return undefined;
   }
 
   async updatePlayerScore(playerId: string, gameId: string, score: number) {
