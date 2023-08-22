@@ -52,9 +52,7 @@ export class GameCacheService {
 
   async updateGameStep(gameId: string, step: GameStep) {
     const key = generateRedisGameSessionKey(gameId);
-    await this.redisService.redisClient().hSet(key, {
-      step,
-    });
+    await this.redisService.updateHash(key, { step });
   }
 
   async deleteGame(gameId: string) {
@@ -63,11 +61,19 @@ export class GameCacheService {
       .del(generateRedisGameSessionKey(gameId));
   }
 
-  async isGameWaiting(gameId: string) {
+  async isGameWaiting(gameId: string, gameStep?: GameStep) {
+    const s = gameStep || GameConstants.step.Waitingplayers;
     const step = await this.redisService
       .redisClient()
       .hGet(generateRedisGameSessionKey(gameId), 'step');
-    if (step === GameConstants.step.Waitingplayers) {
+    console.log(
+      'Step',
+      step,
+      GameConstants.step.Waitingplayers,
+      GameConstants.step.Waitingplayers === step,
+    );
+
+    if (step === s) {
       return true;
     }
     return false;

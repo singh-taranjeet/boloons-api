@@ -1,12 +1,6 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { REDIS_CLIENT, RedisClient } from './redis-client.type';
-import { GameFamily, GameStep, GameType } from 'src/game/utils/types';
-import {
-  generateRedisGameSessionKey,
-  generateRedisKeyPlayerData,
-  generateRedisKeyPlayersList,
-  generateRedisKeySocketPlayer,
-} from 'src/game/utils/methods';
+const expiryTime = 5 * 60;
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -20,6 +14,15 @@ export class RedisService implements OnModuleDestroy {
 
   ping() {
     return this.redis.ping();
+  }
+
+  async createHash(key: string, payload: any) {
+    await this.redis.hSet(key, payload);
+    await this.redis.expire(key, expiryTime);
+  }
+
+  async updateHash(key: string, payload: any) {
+    await this.redis.hSet(key, payload);
   }
 
   public redisClient() {

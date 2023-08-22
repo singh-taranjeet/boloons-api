@@ -18,6 +18,9 @@ export class PlayerService {
       { _id: id },
       { name },
     ).exec();
-    return player._id;
+    return {
+      id: player._id,
+      name,
+    };
   }
 }
