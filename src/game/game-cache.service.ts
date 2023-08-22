@@ -61,7 +61,7 @@ export class GameCacheService {
       .del(generateRedisGameSessionKey(gameId));
   }
 
-  async isGameWaiting(gameId: string, gameStep?: GameStep) {
+  async checkGameStep(gameId: string, gameStep?: GameStep) {
     const s = gameStep || GameConstants.step.Waitingplayers;
     const step = await this.redisService
       .redisClient()
@@ -149,7 +149,7 @@ export class GameCacheService {
     const isPlayerOnline = await this.isPlayerOnline(playerId);
 
     // check if this session exist and is waiting for players
-    const isGameWaiting = await this.isGameWaiting(gameId);
+    const isGameWaiting = await this.checkGameStep(gameId);
 
     const alreadyJoined = await this.isPlayerInGameList(playerId, gameId);
 

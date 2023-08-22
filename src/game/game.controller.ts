@@ -26,11 +26,11 @@ export class GameController {
 
   @Get('/:gameId/:gameStep')
   //@Get(':gameStep')
-  getGame(
+  checkGameStep(
     @Param('gameId') gameId: string,
     @Param('gameStep') gameStep: GameStep,
   ) {
-    return this.GameService.getGame({ gameId, gameStep });
+    return this.GameService.checkGameStep({ gameId, gameStep });
   }
 
   @Post()

@@ -92,16 +92,14 @@ export class GameService {
     throw new NotFoundException();
   }
 
-  async getGame(params: { gameId: string; gameStep: GameStep }) {
+  async checkGameStep(params: { gameId: string; gameStep: GameStep }) {
     const { gameId, gameStep } = params;
-    const isGameWaiting = await this.gameCacheService.isGameWaiting(
+    const isCorrectStep = await this.gameCacheService.checkGameStep(
       gameId,
       gameStep,
     );
 
-    console.log('is waiting', isGameWaiting);
-
-    if (isGameWaiting) {
+    if (isCorrectStep) {
       return AppConstants.response.successResponse();
     }
 

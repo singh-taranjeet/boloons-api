@@ -40,7 +40,7 @@ export class GameGateway implements OnModuleInit {
   async onGameStart(@MessageBody() body: { gameId: string }) {
     const { gameId } = body;
 
-    const isGameWaiting = this.gameCacheService.isGameWaiting(gameId);
+    const isGameWaiting = this.gameCacheService.checkGameStep(gameId);
     if (isGameWaiting) {
       await this.gameCacheService.updateGameStep(
         gameId,
@@ -58,6 +58,12 @@ export class GameGateway implements OnModuleInit {
     @MessageBody() body: { gameId: string; playerId: string; score: number },
   ) {
     const { gameId, playerId, score } = body;
+
+    // Stop this game
+    await this.gameCacheService.updateGameStep(
+      gameId,
+      GameConstants.step.Stopped,
+    );
 
     await this.gameCacheService.updatePlayerScore(playerId, gameId, score);
     const players = await this.gameCacheService.getplayersOfGame(gameId);
