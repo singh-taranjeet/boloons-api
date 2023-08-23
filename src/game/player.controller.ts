@@ -38,9 +38,10 @@ export class PlayerController {
 
   @Patch()
   @HttpCode(HttpStatus.OK)
-  update(@Body() params: { id: string; name: string }) {
+  async update(@Body() params: { id: string; name: string }) {
     const { id, name } = params;
-    return this.PlayerService.updatePlayerName(id, name);
+    const response = await this.PlayerService.updatePlayerName(id, name);
+    return AppConstants.response.successResponse(response);
   }
 
   @Post('/join-game')
