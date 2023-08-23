@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,8 +13,8 @@ import {
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto/update-game.dto';
-import { StopGameDto } from './dto/stop-game.dto/stop-game.dto';
 import { GameStep } from './utils/types';
+import { AppConstants } from 'src/utils/constants';
 
 @Controller('game')
 export class GameController {
@@ -26,11 +27,18 @@ export class GameController {
 
   @Get('/:gameId/:gameStep')
   //@Get(':gameStep')
-  checkGameStep(
+  async checkGameStep(
     @Param('gameId') gameId: string,
     @Param('gameStep') gameStep: GameStep,
   ) {
-    return this.GameService.checkGameStep({ gameId, gameStep });
+    const isCorrectStep = await this.GameService.checkGameStep({
+      gameId,
+      gameStep,
+    });
+    if (isCorrectStep) {
+      return AppConstants.response.successResponse();
+    }
+    throw new BadRequestException();
   }
 
   @Post()

@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { GameConstants, RedisKeys } from './utils/constants';
+import { GameConstants } from './utils/constants';
 import { RedisService } from 'src/redis/redis.service';
 import { GameFamily, GameStep, GameType } from 'src/game/utils/types';
 import {
   generateRedisGameSessionKey,
-  generateRedisKeyPlayerSocket,
-  generateRedisKeySocketPlayer,
   generateRedisKeyPlayersList,
   generateRedisKeyPlayerData,
 } from './utils/methods';
@@ -43,8 +41,7 @@ export class GameCacheService {
 
     const gameKey = generateRedisGameSessionKey(key);
 
-    this.redisService.redisClient().hSet(gameKey, payload);
-    this.redisService.redisClient().expire(gameKey, 5 * 60);
+    this.redisService.createHash(gameKey, payload);
 
     const playersKey = generateRedisKeyPlayersList(key);
     this.redisService.redisClient().expire(playersKey, 5 * 60);
@@ -66,12 +63,7 @@ export class GameCacheService {
     const step = await this.redisService
       .redisClient()
       .hGet(generateRedisGameSessionKey(gameId), 'step');
-    console.log(
-      'Step',
-      step,
-      GameConstants.step.Waitingplayers,
-      GameConstants.step.Waitingplayers === step,
-    );
+    // console.log('Step', step, GameConstants.step.Waitingplayers === step);
 
     if (step === s) {
       return true;
@@ -79,30 +71,30 @@ export class GameCacheService {
     return false;
   }
 
-  async loginUser(playerId: string, socketId: string) {
-    const playerKey = generateRedisKeySocketPlayer(playerId);
-    this.redisService.redisClient().hSet(playerKey, { id: socketId });
+  // async loginUser(playerId: string, socketId: string) {
+  //   const playerKey = generateRedisKeySocketPlayer(playerId);
+  //   this.redisService.redisClient().hSet(playerKey, { id: socketId });
 
-    const key = generateRedisKeyPlayerSocket(socketId);
-    this.redisService.redisClient().hSet(key, { id: playerId });
+  //   const key = generateRedisKeyPlayerSocket(socketId);
+  //   this.redisService.redisClient().hSet(key, { id: playerId });
 
-    this.redisService.redisClient().sAdd(RedisKeys.usersOnline, socketId);
-  }
+  //   this.redisService.redisClient().sAdd(RedisKeys.usersOnline, socketId);
+  // }
 
-  async logoutUser(socketId: string) {
-    const key = generateRedisKeyPlayerSocket(socketId);
-    const playerId = await this.redisService.redisClient().hGet(key, 'id');
-    const key2 = generateRedisKeySocketPlayer(playerId);
-    await this.redisService.redisClient().del(key);
-    await this.redisService.redisClient().del(key2);
-    this.redisService.redisClient().sRem(RedisKeys.usersOnline, socketId);
-  }
+  // async logoutUser(socketId: string) {
+  //   const key = generateRedisKeyPlayerSocket(socketId);
+  //   const playerId = await this.redisService.redisClient().hGet(key, 'id');
+  //   const key2 = generateRedisKeySocketPlayer(playerId);
+  //   await this.redisService.redisClient().del(key);
+  //   await this.redisService.redisClient().del(key2);
+  //   this.redisService.redisClient().sRem(RedisKeys.usersOnline, socketId);
+  // }
 
-  async isPlayerOnline(playerId: string) {
-    const playerKey = generateRedisKeySocketPlayer(playerId);
-    const player = await this.redisService.redisClient().hGet(playerKey, 'id');
-    return player;
-  }
+  // async isPlayerOnline(playerId: string) {
+  //   const playerKey = generateRedisKeySocketPlayer(playerId);
+  //   const player = await this.redisService.redisClient().hGet(playerKey, 'id');
+  //   return player;
+  // }
 
   async addPlayerToGameList(playerId: string, gameId: string) {
     const playersKey = generateRedisKeyPlayersList(gameId);
@@ -117,7 +109,7 @@ export class GameCacheService {
 
   async createPlayerData(playerId: string, playerName: string, gameId: string) {
     const key = generateRedisKeyPlayerData(playerId, gameId);
-    await this.redisService.redisClient().hSet(key, {
+    await this.redisService.createHash(key, {
       name: playerName,
       id: playerId,
       score: 0,
@@ -146,7 +138,7 @@ export class GameCacheService {
   }) {
     const { gameId, name = '', playerId } = body;
 
-    const isPlayerOnline = await this.isPlayerOnline(playerId);
+    // const isPlayerOnline = await this.isPlayerOnline(playerId);
 
     // check if this session exist and is waiting for players
     const isGameWaiting = await this.checkGameStep(gameId);
@@ -179,7 +171,7 @@ export class GameCacheService {
     const isPlayerInGameList = await this.isPlayerInGameList(playerId, gameId);
     if (isPlayerInGameList) {
       const key = generateRedisKeyPlayerData(playerId, gameId);
-      await this.redisService.redisClient().hSet(key, {
+      await this.redisService.updateHash(key, {
         score,
       });
     }

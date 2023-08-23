@@ -83,7 +83,7 @@ export class GameService {
       },
     ).exec();
 
-    console.log('updated', updated);
+    // console.log('updated', updated);
 
     if (updated) {
       return AppConstants.response.successResponse();
@@ -99,10 +99,6 @@ export class GameService {
       gameStep,
     );
 
-    if (isCorrectStep) {
-      return AppConstants.response.successResponse();
-    }
-
-    throw new NotFoundException();
+    return isCorrectStep;
   }
 }

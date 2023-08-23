@@ -23,20 +23,20 @@ export function generateRedisKeyPlayerData(playerId: string, gameId: string) {
   return `${RedisKeys.gameSession}:${gameId}:${RedisKeys.player}:${playerId}`;
 }
 
-/**
- * Hash: Generate Hash key to store all users with their userIds
- * @param id: Socket id
- * @returns players:socketid
- */
-export function generateRedisKeyPlayerSocket(socketId: string) {
-  return `${RedisKeys.players}:${socketId}`;
-}
+// /**
+//  * Hash: Generate Hash key to store all users with their userIds
+//  * @param id: Socket id
+//  * @returns players:socketid
+//  */
+// export function generateRedisKeyPlayerSocket(socketId: string) {
+//   return `${RedisKeys.players}:${socketId}`;
+// }
 
-/**
- * Hash: Generate Hash key to store all users with their socketIds
- * @param id: Socket id
- * @returns players:socketid
- */
-export function generateRedisKeySocketPlayer(playerId: string) {
-  return `${RedisKeys.socket}:${playerId}`;
-}
+// /**
+//  * Hash: Generate Hash key to store all users with their socketIds
+//  * @param id: Socket id
+//  * @returns players:socketid
+//  */
+// export function generateRedisKeySocketPlayer(playerId: string) {
+//   return `${RedisKeys.socket}:${playerId}`;
+// }
