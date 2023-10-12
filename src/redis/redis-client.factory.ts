@@ -6,10 +6,10 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   provide: REDIS_CLIENT,
   useFactory: async () => {
     const client = createClient({
-      password: 'fx49wwsglMMEeV6sM739imNuIv15rUVX',
+      password: 'Xp8xLHa4i0nKpJBF3OrgPTz0xgNO2eEd',
       socket: {
-        host: 'redis-11364.c212.ap-south-1-1.ec2.cloud.redislabs.com',
-        port: 11364,
+        host: 'redis-13762.c264.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 13762,
       },
     });
     await client.connect();

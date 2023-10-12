@@ -9,7 +9,7 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     GameModule,
     MongooseModule.forRoot(
-      'mongodb+srv://test:test@games.lpv5yy8.mongodb.net/?retryWrites=true&w=majority',
+      'mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority',
     ),
     RedisModule,
   ],
