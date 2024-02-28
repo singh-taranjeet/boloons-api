@@ -18,6 +18,7 @@ export const GameConstants = {
   },
   family: {
     SumAddict: 'SumAddict',
+    Sharp: 'Sharp',
   },
 } as const;
 

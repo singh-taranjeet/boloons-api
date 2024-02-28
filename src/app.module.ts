@@ -4,14 +4,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 import { RedisModule } from './redis/redis.module';
-
+import { ConfigModule } from '@nestjs/config';
+import config from './utils/configuration';
 @Module({
   imports: [
     GameModule,
-    MongooseModule.forRoot(
-      'mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority',
-    ),
     RedisModule,
+    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    MongooseModule.forRoot(process.env.DB_URL),
   ],
   controllers: [AppController],
   providers: [AppService],
