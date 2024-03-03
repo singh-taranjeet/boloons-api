@@ -9,10 +9,10 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
     // const secrets = new Secret();
     // await secrets.fetchSecret();
     const client = createClient({
-      password: 'pslGkjQlIPTVK5q8uOjTHkdzFq81nj5F',
+      // password: 'pslGkjQlIPTVK5q8uOjTHkdzFq81nj5F',
       socket: {
-        host: 'redis-10198.c291.ap-southeast-2-1.ec2.cloud.redislabs.com',
-        port: 10198,
+        host: '52.63.201.253',
+        port: 6379,
       },
     });
     await client.connect();
