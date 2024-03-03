@@ -11,7 +11,7 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
     const client = createClient({
       // password: 'pslGkjQlIPTVK5q8uOjTHkdzFq81nj5F',
       socket: {
-        host: '52.63.201.253',
+        host: '0.0.0.0',
         port: 6379,
       },
     });
