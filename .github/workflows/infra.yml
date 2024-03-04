@@ -23,9 +23,9 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build the Docker image
         run: cd app && docker build -t taranjeetsingh/boloons-api-ecs .
-      - name: PUSH TO DOCKER HUB
+      - name: Push to Docker Hub
         run: docker push taranjeetsingh/boloons-api-ecs
       - name: Install cdk
-        run: cd .. && cd cdk && npm install
+        run: cd cdk && npm install
       - name: Create cloudformation stack
         run: cdk deploy
