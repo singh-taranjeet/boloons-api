@@ -5,6 +5,10 @@ import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as elbv2 from "aws-cdk-lib/aws-elasticloadbalancingv2";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
+import * as route53 from "aws-cdk-lib/aws-route53";
+import * as targets from "aws-cdk-lib/aws-route53-targets";
 
 const prefix = "BoloonsApi";
 export class CdkStack extends cdk.Stack {
@@ -21,6 +25,12 @@ export class CdkStack extends cdk.Stack {
       vpc: vpc,
     });
 
+    const certificate = acm.Certificate.fromCertificateArn(
+      this,
+      "Certificate",
+      "arn:aws:acm:ap-southeast-2:533267098557:certificate/e7cec50c-476f-4473-a502-7ff027ee1327"
+    );
+
     const executionRole = iam.Role.fromRoleArn(
       this,
       "ExecutionRole",
@@ -32,8 +42,8 @@ export class CdkStack extends cdk.Stack {
 
     // Create a new Fargate task definition
     const taskDef = new ecs.FargateTaskDefinition(this, `${prefix}TaskDef`, {
-      cpu: 512,
-      memoryLimitMiB: 1024,
+      cpu: 2048,
+      memoryLimitMiB: 4096,
       executionRole: executionRole,
     });
 
@@ -68,7 +78,7 @@ export class CdkStack extends cdk.Stack {
     );
 
     // Create a load-balanced Fargate service and make it public
-    new ecs_patterns.ApplicationLoadBalancedFargateService(
+    const service = new ecs_patterns.ApplicationLoadBalancedFargateService(
       this,
       `${prefix}Service`,
       {
@@ -78,9 +88,25 @@ export class CdkStack extends cdk.Stack {
         taskDefinition: taskDef,
         //memoryLimitMiB: 2048, // Default is 512
         publicLoadBalancer: true, // Default is true,
-        // certificate: certificate,
         assignPublicIp: true,
+        certificate: certificate,
+        minHealthyPercent: 100,
+        maxHealthyPercent: 250,
       }
     );
+
+    // Get the hosted zone
+    const zone = route53.HostedZone.fromLookup(this, "Zone", {
+      domainName: "boloons.com",
+    });
+
+    // Create a record that points to the load balancer
+    new route53.ARecord(this, "AliasRecord", {
+      zone: zone,
+      recordName: "server.boloons.com",
+      target: route53.RecordTarget.fromAlias(
+        new targets.LoadBalancerTarget(service.loadBalancer)
+      ),
+    });
   }
 }

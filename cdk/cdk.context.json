@@ -35,5 +35,9 @@
         ]
       }
     ]
+  },
+  "hosted-zone:account=533267098557:domainName=boloons.com:region=ap-southeast-2": {
+    "Id": "/hostedzone/Z04594432V4LFM5DNLM9X",
+    "Name": "boloons.com."
   }
 }
