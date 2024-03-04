@@ -34,4 +34,4 @@ jobs:
       - name: test
         run: ls -l
       - name: Create cloudformation stack
-        run: cd cdk && npm install && cdk deploy
+        run: cd cdk && npm install && npm install -g aws-cdk && cdk deploy
