@@ -42,8 +42,8 @@ export class CdkStack extends cdk.Stack {
 
     // Create a new Fargate task definition
     const taskDef = new ecs.FargateTaskDefinition(this, `${prefix}TaskDef`, {
-      cpu: 2048,
-      memoryLimitMiB: 4096,
+      cpu: 512,
+      memoryLimitMiB: 1024,
       executionRole: executionRole,
     });
 
