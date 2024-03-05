@@ -9,9 +9,9 @@ import config from './utils/configuration';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     GameModule,
     RedisModule,
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     MongooseModule.forRoot(
       'mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority',
     ),
