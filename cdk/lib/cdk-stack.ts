@@ -42,8 +42,8 @@ export class CdkStack extends cdk.Stack {
 
     // Create a new Fargate task definition
     const taskDef = new ecs.FargateTaskDefinition(this, `${prefix}TaskDef`, {
-      cpu: 1024,
-      memoryLimitMiB: 2048,
+      cpu: 512,
+      memoryLimitMiB: 1024,
       executionRole: executionRole,
     });
 
@@ -52,7 +52,6 @@ export class CdkStack extends cdk.Stack {
       // expose port 6379 for redis
       portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
       essential: true,
-      privileged: true,
     });
 
     // Add a container to the task definition
@@ -85,10 +84,8 @@ export class CdkStack extends cdk.Stack {
       `${prefix}Service`,
       {
         cluster: cluster, // Required
-        //cpu: 2, // Default is 256
         desiredCount: 1, // Default is 1
         taskDefinition: taskDef,
-        //memoryLimitMiB: 2048, // Default is 512
         publicLoadBalancer: true, // Default is true,
         assignPublicIp: true,
         certificate: certificate,
