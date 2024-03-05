@@ -28,7 +28,7 @@ export class CdkStack extends cdk.Stack {
     const certificate = acm.Certificate.fromCertificateArn(
       this,
       "Certificate",
-      "arn:aws:acm:ap-southeast-2:533267098557:certificate/e7cec50c-476f-4473-a502-7ff027ee1327"
+      "arn:aws:acm:us-east-1:533267098557:certificate/d5a47a7c-00ab-43b6-a50a-b26e59106af6"
     );
 
     const executionRole = iam.Role.fromRoleArn(
@@ -42,8 +42,8 @@ export class CdkStack extends cdk.Stack {
 
     // Create a new Fargate task definition
     const taskDef = new ecs.FargateTaskDefinition(this, `${prefix}TaskDef`, {
-      cpu: 512,
-      memoryLimitMiB: 1024,
+      cpu: 2048,
+      memoryLimitMiB: 4096,
       executionRole: executionRole,
     });
 
@@ -73,7 +73,7 @@ export class CdkStack extends cdk.Stack {
       new iam.PolicyStatement({
         actions: ["secretsmanager:GetSecretValue"],
         resources: [
-          "arn:aws:secretsmanager:ap-southeast-2:533267098557:secret:boloons-api-secret-B3c3bG",
+          "arn:aws:secretsmanager:us-east-1:533267098557:secret:boloons-api-secret-B3c3bG",
         ],
       })
     );
