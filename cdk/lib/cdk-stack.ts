@@ -42,9 +42,17 @@ export class CdkStack extends cdk.Stack {
 
     // Create a new Fargate task definition
     const taskDef = new ecs.FargateTaskDefinition(this, `${prefix}TaskDef`, {
-      cpu: 512,
-      memoryLimitMiB: 1024,
+      cpu: 1024,
+      memoryLimitMiB: 2048,
       executionRole: executionRole,
+    });
+
+    taskDef.addContainer(`${prefix}RedisContainer`, {
+      image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
+      // expose port 6379 for redis
+      portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
+      essential: true,
+      privileged: true,
     });
 
     // Add a container to the task definition
@@ -59,12 +67,6 @@ export class CdkStack extends cdk.Stack {
       // expose port 4000 for redis
       portMappings: [{ containerPort: 4000, protocol: ecs.Protocol.TCP }],
       essential: true,
-    });
-
-    taskDef.addContainer(`${prefix}RedisContainer`, {
-      image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
-      // expose port 6379 for redis
-      portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
     });
 
     // Add permissions to the task to access AWS Secrets Manager
