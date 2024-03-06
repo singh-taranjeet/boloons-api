@@ -17,15 +17,18 @@ export class RedisService implements OnModuleDestroy {
   }
 
   async createHash(key: string, payload: any) {
+    console.log('Creating Hash', key, payload);
     await this.redis.hSet(key, payload);
     await this.redis.expire(key, expiryTime);
   }
 
   async updateHash(key: string, payload: any) {
+    console.log('Updating Hash', key, payload);
     await this.redis.hSet(key, payload);
   }
 
   public redisClient() {
+    console.log('Redis client requested');
     return this.redis;
   }
 }
