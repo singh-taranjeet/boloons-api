@@ -1,4 +1,0 @@
-DB_URL="mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority"
-REDIS_PASSWORD="pslGkjQlIPTVK5q8uOjTHkdzFq81nj5F"
-REDIS_URL="dredis-10198.c291.ap-southeast-2-1.ec2.cloud.redislabs.com"
-REDIS_PORT=10198
