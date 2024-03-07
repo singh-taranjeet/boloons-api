@@ -12,6 +12,7 @@ import config from './utils/configuration';
     ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     GameModule,
     RedisModule,
+    // TODO: Add the MongooseModule to the imports array
     MongooseModule.forRoot(
       'mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority',
     ),

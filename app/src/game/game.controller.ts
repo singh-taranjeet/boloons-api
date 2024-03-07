@@ -25,7 +25,6 @@ export class GameController {
   }
 
   @Get('/:gameId/:gameStep')
-  //@Get(':gameStep')
   async checkGameStep(
     @Param('gameId') gameId: string,
     @Param('gameStep') gameStep: GameStep,
