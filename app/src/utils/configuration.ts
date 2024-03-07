@@ -25,23 +25,22 @@ export class Secret {
     region: 'us-east-1',
   });
 
-  private async memoize() {
-    const cache = {};
-    return async (n: keyof SecretType) => {
-      if (cache[n]) {
-        console.log('Fetching from cache...');
-        return cache[n];
-      } else {
-        console.log('Not found in cache... fetching from AWS Secrets Manager');
-        await this.fetchSecret();
-        cache[n] = this.secrets?.[n];
-        return cache[n];
-      }
-    };
+  private cache: { [key: string]: string } = {};
+
+  private async memoize(n: keyof SecretType) {
+    if (this.cache[n]) {
+      console.log('Fetching from cache...');
+      return this.cache[n];
+    } else {
+      console.log('Not found in cache... fetching from AWS Secrets Manager');
+      await this.fetchSecret();
+      this.cache[n] = this.secrets?.[n];
+      return this.cache[n];
+    }
   }
 
-  async getSecretValue() {
-    return this.memoize();
+  async getSecretValue(n: keyof SecretType) {
+    return this.memoize(n);
   }
 
   async fetchSecret() {
@@ -58,10 +57,7 @@ export class Secret {
         }),
       );
       this.secrets = JSON.parse(response.SecretString) as SecretType;
-
-      console.log('Secrets fetched', this.secrets);
     } catch (error) {
-      console.log('Error: Secrets Manager', error);
       throw error;
     }
   }
@@ -80,18 +76,11 @@ export default async () => {
   const secret = new Secret();
   await secret.fetchSecret();
 
-  const memo = await secret.getSecretValue();
-  const DB_URL = await memo('mongo-db-url');
-  const REDIS_URL = await memo('redis-url');
-  const REDIS_PASSWORD = await memo('redis-password');
-  const REDIS_PORT = await memo('redis-port');
-
-  console.log('Config variables being set', {
-    DB_URL,
-    REDIS_URL,
-    REDIS_PASSWORD,
-    REDIS_PORT,
-  });
+  //const memo = await secret.getSecretValue();
+  const DB_URL = await secret.getSecretValue('mongo-db-url');
+  const REDIS_URL = await secret.getSecretValue('redis-url');
+  const REDIS_PASSWORD = await secret.getSecretValue('redis-password');
+  const REDIS_PORT = await secret.getSecretValue('redis-port');
 
   return {
     DB_URL,
