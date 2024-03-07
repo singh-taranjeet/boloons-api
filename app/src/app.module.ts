@@ -5,17 +5,23 @@ import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 import { RedisModule } from './redis/redis.module';
 import { ConfigModule } from '@nestjs/config';
-import config from './utils/configuration';
+import config, { Secret } from './utils/configuration';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     GameModule,
     RedisModule,
-    // TODO: Add the MongooseModule to the imports array
-    MongooseModule.forRoot(
-      'mongodb+srv://taranjeet:taranjeet@taranjeetsinghcluster.cwae524.mongodb.net/?retryWrites=true&w=majority',
-    ),
+    MongooseModule.forRootAsync({
+      useFactory: async () => {
+        const secrets = new Secret();
+        secrets.fetchSecret();
+        const MONGO_URL = await secrets.getSecretValue('mongo-db-url');
+        return {
+          uri: MONGO_URL,
+        };
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -8,9 +8,8 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   useFactory: async () => {
     const sercret = new Secret();
     await sercret.fetchSecret();
-    const memo = await sercret.getSecretValue();
-    const REDIS_URL = await memo('redis-url');
-    const REDIS_PORT = await memo('redis-port');
+    const REDIS_URL = await sercret.getSecretValue('redis-url');
+    const REDIS_PORT = await sercret.getSecretValue('redis-port');
     const client = createClient({
       socket: {
         host: REDIS_URL,
