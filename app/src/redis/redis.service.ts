@@ -28,7 +28,7 @@ export class RedisService implements OnModuleDestroy {
   }
 
   public redisClient() {
-    console.log('Redis client requested');
+    // console.log('Redis client requested');
     return this.redis;
   }
 }
