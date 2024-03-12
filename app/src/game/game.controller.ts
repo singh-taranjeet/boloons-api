@@ -24,6 +24,15 @@ export class GameController {
     return this.GameService.getAllGames();
   }
 
+  @Get('/:gameId')
+  async getGame(@Param('gameId') gameId: string) {
+    const game = await this.GameService.getGame(gameId);
+    if (game) {
+      return AppConstants.response.successResponse(game);
+    }
+    throw new BadRequestException();
+  }
+
   @Get('/:gameId/:gameStep')
   async checkGameStep(
     @Param('gameId') gameId: string,

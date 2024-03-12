@@ -1,4 +1,4 @@
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { GameConstants } from 'src/game/utils/constants';
 import { GameFamily, GameType } from 'src/game/utils/types';
 export class CreateGameDto {
@@ -7,4 +7,7 @@ export class CreateGameDto {
 
   @IsEnum(GameConstants.family)
   family: GameFamily;
+
+  @IsString()
+  createdBy: string;
 }

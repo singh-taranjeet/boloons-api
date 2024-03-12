@@ -16,11 +16,12 @@ export class GameService {
   ) {}
 
   async createGame(createGameDto: CreateGameDto) {
-    const { type, family } = createGameDto;
+    const { type, family, createdBy } = createGameDto;
     // Create Record on Mongo
     const createdGame = new this.GameModel({
       type,
       family,
+      createdBy,
       step: GameConstants.step.Waitingplayers,
     });
     await createdGame.save();
@@ -100,5 +101,13 @@ export class GameService {
     );
 
     return isCorrectStep;
+  }
+
+  async getGame(gameId: string) {
+    const game = await this.GameModel.findOne({
+      _id: gameId,
+    }).exec();
+    console.log('game', game);
+    return game;
   }
 }
