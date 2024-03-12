@@ -14,6 +14,9 @@ export class Game {
 
   @Prop()
   family: GameFamily;
+
+  @Prop()
+  createdBy: string;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);
