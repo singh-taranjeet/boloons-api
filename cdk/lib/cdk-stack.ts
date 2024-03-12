@@ -46,7 +46,7 @@ export class CdkStack extends cdk.Stack {
       executionRole: executionRole,
     });
 
-    // Add a container to the task definition
+    // Add a container to the task definition for app
     taskDef.addContainer(`${prefix}AppContainer`, {
       image: ecs.ContainerImage.fromRegistry(
         "taranjeetsingh/boloons-api-ecs:latest"
