@@ -15,7 +15,6 @@ import config, { Secret } from './utils/configuration';
     MongooseModule.forRootAsync({
       useFactory: async () => {
         const secrets = new Secret();
-        secrets.fetchSecret();
         const MONGO_URL = await secrets.getSecretValue('mongo-db-url');
         return {
           uri: MONGO_URL,

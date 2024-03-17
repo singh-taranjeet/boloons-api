@@ -11,55 +11,77 @@ interface SecretType {
   'redis-port': string;
 }
 
-export class Secret {
-  constructor() {
-    if (this.secrets) {
-      console.log('Constructor: using cached secrets');
+const cacheSecret = memoSecret();
+
+function memoCallBack(callBack: () => Promise<SecretType>) {
+  let result;
+  let loading = false;
+  return async () => {
+    if (result) {
+      return result;
     }
-  }
-  private secretName = 'boloons-api-secret';
+    if (loading) {
+      function wait() {
+        if (loading) {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(wait());
+            }, 1000);
+          });
+        } else {
+          return result;
+        }
+      }
+      return await wait();
+    }
+    loading = true;
+    result = await callBack();
+    loading = false;
 
-  private secrets: SecretType | undefined;
+    return result;
+  };
+}
 
-  private client = new SecretsManagerClient({
+const fetchSecret = memoCallBack(async () => {
+  const client = new SecretsManagerClient({
     region: 'us-east-1',
   });
+  const secretName = 'boloons-api-secret';
+  try {
+    console.log('Making request for secrets');
+    const response = await client.send(
+      new GetSecretValueCommand({
+        SecretId: secretName,
+        VersionStage: 'AWSCURRENT', // VersionStage defaults to AWSCURRENT if unspecified
+      }),
+    );
 
-  private cache: { [key: string]: string } = {};
+    return JSON.parse(response.SecretString) as SecretType;
+  } catch (error) {
+    throw error;
+  }
+});
 
-  private async memoize(n: keyof SecretType) {
-    if (this.cache[n]) {
-      console.log('Fetching from cache...');
-      return this.cache[n];
+function memoSecret() {
+  let cache: SecretType;
+
+  return async (n: keyof SecretType) => {
+    if (cache && cache[n]) {
+      return cache[n];
     } else {
-      console.log('Not found in cache... fetching from AWS Secrets Manager');
-      await this.fetchSecret();
-      this.cache[n] = this.secrets?.[n];
-      return this.cache[n];
+      cache = await fetchSecret();
+      return cache[n];
     }
-  }
+  };
+}
 
+export class Secret {
   async getSecretValue(n: keyof SecretType) {
-    return this.memoize(n);
+    return cacheSecret(n);
   }
 
-  async fetchSecret() {
-    if (this.secrets) {
-      console.log('using cached secrets');
-      return;
-    }
-
-    try {
-      const response = await this.client.send(
-        new GetSecretValueCommand({
-          SecretId: this.secretName,
-          VersionStage: 'AWSCURRENT', // VersionStage defaults to AWSCURRENT if unspecified
-        }),
-      );
-      this.secrets = JSON.parse(response.SecretString) as SecretType;
-    } catch (error) {
-      throw error;
-    }
+  private async fetchSecret() {
+    return fetchSecret();
   }
 }
 
@@ -74,7 +96,6 @@ export default async () => {
   }
 
   const secret = new Secret();
-  await secret.fetchSecret();
 
   //const memo = await secret.getSecretValue();
   const DB_URL = await secret.getSecretValue('mongo-db-url');
