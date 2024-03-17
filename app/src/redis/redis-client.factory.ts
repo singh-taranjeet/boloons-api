@@ -7,7 +7,6 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   provide: REDIS_CLIENT,
   useFactory: async () => {
     const sercret = new Secret();
-    await sercret.fetchSecret();
     const REDIS_URL = await sercret.getSecretValue('redis-url');
     const REDIS_PORT = await sercret.getSecretValue('redis-port');
     const client = createClient({
