@@ -49,7 +49,7 @@ export class CdkStack extends cdk.Stack {
     // Add a container to the task definition for app
     taskDef.addContainer(`${prefix}AppContainer`, {
       image: ecs.ContainerImage.fromRegistry(
-        "taranjeetsingh/boloons-api-ecs:latest"
+        "taranjeetsingh/boloons-api:latest"
       ),
       logging: new ecs.AwsLogDriver({
         streamPrefix: prefix,
@@ -70,7 +70,7 @@ export class CdkStack extends cdk.Stack {
       new iam.PolicyStatement({
         actions: ["secretsmanager:GetSecretValue"],
         resources: [
-          "arn:aws:secretsmanager:us-east-1:533267098557:secret:boloons-api-secret-B3c3bG",
+          "arn:aws:secretsmanager:us-east-1:533267098557:secret:boloons-api-secret-deUr2C",
         ],
       })
     );
@@ -93,13 +93,13 @@ export class CdkStack extends cdk.Stack {
 
     // Get the hosted zone
     const zone = route53.HostedZone.fromLookup(this, "Zone", {
-      domainName: "boloons.com",
+      domainName: "send-to-cloud.com",
     });
 
     // Create a record that points to the load balancer
     new route53.ARecord(this, "AliasRecord", {
       zone: zone,
-      recordName: "api.boloons.com",
+      recordName: "api.send-to-cloud.com",
       target: route53.RecordTarget.fromAlias(
         new targets.LoadBalancerTarget(service.loadBalancer)
       ),
