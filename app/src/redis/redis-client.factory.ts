@@ -9,7 +9,9 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
     const sercret = new Secret();
     const REDIS_URL = await sercret.getSecretValue('redis-url');
     const REDIS_PORT = await sercret.getSecretValue('redis-port');
+    const REDIS_PASSWORD = await sercret.getSecretValue('redis-password');
     const client = createClient({
+      password: REDIS_PASSWORD,
       socket: {
         host: REDIS_URL,
         port: REDIS_PORT ? parseInt(REDIS_PORT) : 6379,
