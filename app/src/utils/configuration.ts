@@ -43,6 +43,14 @@ function memoCallBack(callBack: () => Promise<SecretType>) {
 }
 
 const fetchSecret = memoCallBack(async () => {
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      'mongo-db-url': process.env.DB_URL,
+      'redis-url': process.env.REDIS_URL,
+      'redis-password': process.env.REDIS_PASSWORD,
+      'redis-port': process.env.REDIS_PORT,
+    };
+  }
   const client = new SecretsManagerClient({
     region: 'us-east-1',
   });
@@ -85,19 +93,23 @@ export class Secret {
   }
 }
 
+function getLocalConfig() {
+  return {
+    DB_URL: process.env.DB_URL,
+    REDIS_URL: process.env.REDIS_URL,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+    REDIS_PORT: process.env.REDIS_PORT,
+  };
+}
+
 export default async () => {
-  if (process.env.NODE_ENV === 'developmednt') {
-    return {
-      DB_URL: process.env.DB_URL,
-      REDIS_URL: process.env.REDIS_URL,
-      REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-      REDIS_PORT: process.env.REDIS_PORT,
-    };
+  if (process.env.NODE_ENV === 'development') {
+    return getLocalConfig();
   }
 
-  const secret = new Secret();
+  console.log('Fetching secrets from AWS Secrets Manager');
 
-  //const memo = await secret.getSecretValue();
+  const secret = new Secret();
   const DB_URL = await secret.getSecretValue('mongo-db-url');
   const REDIS_URL = await secret.getSecretValue('redis-url');
   const REDIS_PASSWORD = await secret.getSecretValue('redis-password');
