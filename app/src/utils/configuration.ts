@@ -93,7 +93,6 @@ import 'dotenv/config';
 
 export default async () => {
   return {
-
     REDIS_URL: 'localhost',
     REDIS_PASSWORD: '',
     REDIS_PORT: '6379',

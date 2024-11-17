@@ -9,15 +9,17 @@ import config from './utils/configuration';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      ignoreEnvFile: true
+    }),
     GameModule,
     RedisModule,
     MongooseModule.forRootAsync({
       useFactory: async () => {
-        ;
-        const MONGO_URL = process.env.DB_URL;
         return {
-          uri: MONGO_URL,
+          uri: 'mongodb://localhost:27017',
         };
       },
     }),

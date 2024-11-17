@@ -71,6 +71,11 @@ export class CdkStack extends cdk.Stack {
     taskDef.addContainer(`${prefix}MongoContainer`, {
       image: ecs.ContainerImage.fromRegistry("mongo:latest"),
       essential: false,
+      // Add environment variables
+      environment: {
+        MONGO_INITDB_ROOT_USERNAME: "root",
+        MONGO_INITDB_ROOT_PASSWORD: "password",
+      },
       portMappings: [{ containerPort: 27017, protocol: ecs.Protocol.TCP }],
     });
 
