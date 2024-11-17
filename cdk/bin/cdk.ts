@@ -4,7 +4,7 @@ import * as cdk from "aws-cdk-lib";
 import { CdkStack } from "../lib/cdk-stack";
 const envAU = { account: "533267098557", region: "us-east-1" };
 const app = new cdk.App();
-new CdkStack(app, "BoloonsApiServerCloudStack3", {
+new CdkStack(app, "BoloonsApiServerCloudStack", {
   env: envAU,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
