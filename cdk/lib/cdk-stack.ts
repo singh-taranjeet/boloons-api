@@ -27,7 +27,7 @@ export class CdkStack extends cdk.Stack {
     const certificate = acm.Certificate.fromCertificateArn(
       this,
       "Certificate",
-      "arn:aws:acm:us-east-1:533267098557:certificate/125de4aa-319a-4f14-a8a5-3934dc66397b"
+      "arn:aws:acm:us-east-1:533267098557:certificate/664f3090-e5a6-4919-91a5-d8c90a416dd0"
     );
 
     const executionRole = iam.Role.fromRoleArn(
