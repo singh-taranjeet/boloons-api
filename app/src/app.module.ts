@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 import { RedisModule } from './redis/redis.module';
 import { ConfigModule } from '@nestjs/config';
-import config, { Secret } from './utils/configuration';
+import config from './utils/configuration';
 
 @Module({
   imports: [
@@ -14,8 +14,8 @@ import config, { Secret } from './utils/configuration';
     RedisModule,
     MongooseModule.forRootAsync({
       useFactory: async () => {
-        const secrets = new Secret();
-        const MONGO_URL = await secrets.getSecretValue('mongo-db-url');
+        ;
+        const MONGO_URL = process.env.DB_URL;
         return {
           uri: MONGO_URL,
         };
@@ -26,4 +26,4 @@ import config, { Secret } from './utils/configuration';
   providers: [AppService],
   exports: [RedisModule],
 })
-export class AppModule {}
+export class AppModule { }

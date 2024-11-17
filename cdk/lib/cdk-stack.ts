@@ -27,7 +27,7 @@ export class CdkStack extends cdk.Stack {
     const certificate = acm.Certificate.fromCertificateArn(
       this,
       "Certificate",
-      "arn:aws:acm:us-east-1:533267098557:certificate/d5a47a7c-00ab-43b6-a50a-b26e59106af6"
+      "arn:aws:acm:us-east-1:533267098557:certificate/125de4aa-319a-4f14-a8a5-3934dc66397b"
     );
 
     const executionRole = iam.Role.fromRoleArn(
@@ -60,20 +60,19 @@ export class CdkStack extends cdk.Stack {
       essential: true,
     });
 
+    // add container for redis
     taskDef.addContainer(`${prefix}RedisContainer`, {
       image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
       essential: false,
+      portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
     });
 
-    // Add permissions to the task to access AWS Secrets Manager
-    taskDef.addToTaskRolePolicy(
-      new iam.PolicyStatement({
-        actions: ["secretsmanager:GetSecretValue"],
-        resources: [
-          "arn:aws:secretsmanager:us-east-1:533267098557:secret:boloons-api-secret-deUr2C",
-        ],
-      })
-    );
+    // add container for mongodb
+    taskDef.addContainer(`${prefix}MongoContainer`, {
+      image: ecs.ContainerImage.fromRegistry("mongo:latest"),
+      essential: false,
+      portMappings: [{ containerPort: 27017, protocol: ecs.Protocol.TCP }],
+    });
 
     // Create a load-balanced Fargate service and make it public
     const service = new ecs_patterns.ApplicationLoadBalancedFargateService(
@@ -93,13 +92,13 @@ export class CdkStack extends cdk.Stack {
 
     // Get the hosted zone
     const zone = route53.HostedZone.fromLookup(this, "Zone", {
-      domainName: "send-to-cloud.com",
+      domainName: "taranjeet-singh.com",
     });
 
     // Create a record that points to the load balancer
     new route53.ARecord(this, "AliasRecord", {
       zone: zone,
-      recordName: "api.send-to-cloud.com",
+      recordName: "boloon-api.taranjeet-singh.com",
       target: route53.RecordTarget.fromAlias(
         new targets.LoadBalancerTarget(service.loadBalancer)
       ),

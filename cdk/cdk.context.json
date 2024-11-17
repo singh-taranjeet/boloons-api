@@ -52,5 +52,9 @@
   "hosted-zone:account=533267098557:domainName=send-to-cloud.com:region=us-east-1": {
     "Id": "/hostedzone/Z02598143I89URSX8DAA",
     "Name": "send-to-cloud.com."
+  },
+  "hosted-zone:account=533267098557:domainName=taranjeet-singh.com:region=us-east-1": {
+    "Id": "/hostedzone/Z07856391V45U4XM88EV6",
+    "Name": "taranjeet-singh.com."
   }
 }
