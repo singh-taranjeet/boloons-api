@@ -49,7 +49,7 @@ export class CdkStack extends cdk.Stack {
     // Add a container to the task definition for app
     taskDef.addContainer(`${prefix}AppContainer`, {
       image: ecs.ContainerImage.fromRegistry(
-        "taranjeetsingh/boloons-api:latest"
+        "taranjeetsingh/boloons-api-ecs:latest"
       ),
       logging: new ecs.AwsLogDriver({
         streamPrefix: prefix,
