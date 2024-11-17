@@ -55,7 +55,7 @@ export class CdkStack extends cdk.Stack {
         streamPrefix: prefix,
         logRetention: logs.RetentionDays.ONE_WEEK,
       }),
-      // expose port 4000 for redis
+      // connect redis and mongo on port
       portMappings: [{ containerPort: 4000, protocol: ecs.Protocol.TCP }],
       essential: true,
     });
@@ -64,6 +64,7 @@ export class CdkStack extends cdk.Stack {
     taskDef.addContainer(`${prefix}RedisContainer`, {
       image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
       essential: false,
+      // Add environment variables
       portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
     });
 

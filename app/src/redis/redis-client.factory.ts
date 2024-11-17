@@ -8,7 +8,7 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
     console.log('Creating Redis Client', process.env.REDIS_URL);
     const client = createClient({
       socket: {
-        host: '127.0.0.1',
+        host: 'BoloonsApiServerRedisContainer',
         port: 6379,
       },
     });
