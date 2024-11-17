@@ -19,7 +19,7 @@ import config from './utils/configuration';
     MongooseModule.forRootAsync({
       useFactory: async () => {
         return {
-          uri: 'mongodb://127.0.0.1:27017',
+          uri: `mongodb://${process.env.NODE_ENV === 'development' ? 'BoloonsApiServerRedisContainer' : 'localhost'}:27017`,
         };
       },
     }),
