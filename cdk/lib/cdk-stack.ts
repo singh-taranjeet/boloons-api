@@ -62,7 +62,7 @@ export class CdkStack extends cdk.Stack {
 
     // add container for redis
     taskDef.addContainer(`${prefix}RedisContainer`, {
-      image: ecs.ContainerImage.fromRegistry("redis:latest"),
+      image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
       essential: false,
       // Add environment variables
       portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
@@ -72,11 +72,6 @@ export class CdkStack extends cdk.Stack {
     taskDef.addContainer(`${prefix}MongoContainer`, {
       image: ecs.ContainerImage.fromRegistry("mongo:latest"),
       essential: false,
-      // Add environment variables
-      environment: {
-        MONGO_INITDB_ROOT_USERNAME: "root",
-        MONGO_INITDB_ROOT_PASSWORD: "password",
-      },
       portMappings: [{ containerPort: 27017, protocol: ecs.Protocol.TCP }],
     });
 
