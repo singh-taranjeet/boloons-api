@@ -19,7 +19,7 @@ import config from './utils/configuration';
     MongooseModule.forRootAsync({
       useFactory: async () => {
         return {
-          uri: 'mongodb://root:passwordlocalhost:27017'
+          uri: 'mongodb://root:password@localhost:27017'
         };
       },
     }),
