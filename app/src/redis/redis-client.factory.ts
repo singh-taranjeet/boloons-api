@@ -5,10 +5,10 @@ import { RedisClient, REDIS_CLIENT } from './redis-client.type';
 export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   provide: REDIS_CLIENT,
   useFactory: async () => {
-    console.log('Creating Redis Client', process.env.REDIS_URL);
+
     const client = createClient({
       socket: {
-        host: process.env.NODE_ENV === 'development' ? 'BoloonsApiServerRedisContainer' : 'localhost',
+        host: 'localhost',
         port: 6379,
       },
     });
