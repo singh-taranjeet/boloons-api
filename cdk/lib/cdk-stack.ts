@@ -62,7 +62,7 @@ export class CdkStack extends cdk.Stack {
 
     // add container for redis
     taskDef.addContainer(`${prefix}RedisContainer`, {
-      image: ecs.ContainerImage.fromRegistry("redis/redis-stack-server:latest"),
+      image: ecs.ContainerImage.fromRegistry("redis:latest"),
       essential: false,
       // Add environment variables
       portMappings: [{ containerPort: 6379, protocol: ecs.Protocol.TCP }],
